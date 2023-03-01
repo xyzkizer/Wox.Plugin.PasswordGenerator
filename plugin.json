@@ -1,0 +1,13 @@
+{
+    "ID":"b5cd2fb8-2fd3-4f9c-801d-1b1162b5a3a7",
+    "ActionKeyword":"pg",
+    "Name":"PasswordGenerator",
+    "Description":"generate random password",
+    "Author":"xyzkizer",
+    "Version":"1.0",
+    "Language":"python",
+    "Website":"https://github.com/xyzkizer/Wox.Plugin.PasswordGenertor",
+    "IcoPath":"Images\\app.png",
+    "ExecuteFileName":"main.py",
+    "Disabled": true
+}
