@@ -19,13 +19,12 @@ class PasswordGenerator(Wox):
 
         # blank keyword
         if not query:
-            with shelve.open(LOCAL_STORAGE) as db:
-                results.append({
-                    "Title": "请输入密码长度",
-                    "SubTitle": "随机生成指定长度的复杂密码",
-                    "IcoPath":"Images/app.png",
-                })
-
+            results.append({
+                "Title": "请输入密码长度",
+                "SubTitle": "随机生成指定长度的复杂密码",
+                "IcoPath":"Images/app.png",
+            })
+            with shelve.open(LOCAL_STORAGE, writeback=True) as db:
                 if "copy_history" in db:
                     for r in db["copy_history"]:
                         results.append({
@@ -33,26 +32,24 @@ class PasswordGenerator(Wox):
                             "SubTitle": "Created At {}".format(r[1]),
                             "IcoPath":"Images/app.png",
                             "JsonRPCAction": {
-                            'method': 'copy_without_his',
-                            'parameters': [r[0]],
-                            'dontHideAfterAction': False
-                }
+                                'method': 'copy',
+                                'parameters': [r[0], False],
+                                'dontHideAfterAction': False
+                            }
                         })
 
-                return results
+            return results
         
         #define data
         lower = string.ascii_lowercase
         upper = string.ascii_uppercase
         num = string.digits
-        # symbols = string.punctuation
         symbols = "#$%&*+=?@^"
 
         all = lower + upper + num + symbols
 
-        password = "".join(random.sample(all, int(query)))
-
         for i in range(6):
+            password = "".join(random.sample(all, int(query)))
             results.append({
                 "Title": "".join(password),
                 # "SubTitle": "".join(""),
@@ -60,25 +57,21 @@ class PasswordGenerator(Wox):
                 "ContextData": "ctxData",
                 "JsonRPCAction": {
                     'method': 'copy',
-                    'parameters': [password],
+                    'parameters': [password, True],
                     'dontHideAfterAction': False
                 }
             })
 
         return results
 
-    def copy_without_his(self, text):
+    def copy(self, text, log):
         clipboard.copy(text)
-
-    def copy(self, text):
-        clipboard.copy(text)
-        copyAt = datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
-
-        with shelve.open(LOCAL_STORAGE, writeback=True) as db:
-
-            if "copy_history" not in db:
-                db["copy_history"] = deque(maxlen=6)
-            db["copy_history"].appendleft((text, copyAt))
+        if log:
+            copyAt = datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
+            with shelve.open(LOCAL_STORAGE, writeback=True) as db:
+                if "copy_history" not in db:
+                    db["copy_history"] = deque(maxlen=6)
+                db["copy_history"].appendleft((text, copyAt))
             
 
 if __name__ == "__main__":
